@@ -1,1 +1,1 @@
-export * from "./auth-schema"
+// Add your database schema here
