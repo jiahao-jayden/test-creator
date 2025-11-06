@@ -8,6 +8,13 @@ import { sendEmail } from "@/lib/create-email"
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
   baseURL: process.env.NEXT_PUBLIC_BASE_URL as string,
+  trustedOrigins: [
+    process.env.NEXT_PUBLIC_BASE_URL as string,
+    "*.e2b.dev",
+    "*.we0.ai",
+    "http://localhost:3345",
+    "http://localhost:3000",
+  ],
   plugins: [
     nextCookies(),
     emailOTP({

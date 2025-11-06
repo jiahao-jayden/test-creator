@@ -1,6 +1,5 @@
-import { getSessionCookie } from "better-auth/cookies"
+import { getCookieCache, getSessionCookie } from "better-auth/cookies"
 import { type NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth/server-auth"
 
 interface CreateMiddlewareOptions {
   protectedRoutes: string[]
@@ -43,7 +42,7 @@ const matchRoutes = (pathname: string, routes: string[]): boolean => {
 const getRouteInfo = (
   pathname: string,
   protectedRoutes: string[],
-  protectedAPIRoutes: string[]
+  protectedAPIRoutes: string[],
 ): RouteInfo => {
   const isAPI = matchRoutes(pathname, protectedAPIRoutes) || pathname.startsWith("/api")
 
@@ -91,11 +90,11 @@ export const createMiddleware = (options: CreateMiddlewareOptions) => {
     }
 
     if (routeType === "admin") {
-      const session = await auth.api.getSession({
-        headers: request.headers,
+      const session = await getCookieCache(request, {
+        secret: process.env.BETTER_AUTH_SECRET,
       })
 
-      if (!isAdmin(session?.user.email)) {
+      if (!session || !isAdmin(session?.user.email)) {
         if (isAPI) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 })
         }
