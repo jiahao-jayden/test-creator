@@ -18,5 +18,7 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
-  "registries": {}
+  "registries": {
+    "@we0": "http://35.93.31.154:3345/r/{name}.json"
+  }
 }
