@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
         or(
           ilike(blogs.title, `%${search}%`),
           ilike(blogs.content, `%${search}%`),
-          ilike(blogs.excerpt, `%${search}%`),
-        ),
+          ilike(blogs.excerpt, `%${search}%`)
+        )
       )
     }
 
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
         success: false,
         error: "Failed to fetch blogs",
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
           success: false,
           error: "Slug already exists",
         },
-        { status: 400 },
+        { status: 400 }
       )
     }
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         success: true,
         data: newBlog,
       },
-      { status: 201 },
+      { status: 201 }
     )
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
           error: "Validation failed",
           details: error.issues,
         },
-        { status: 400 },
+        { status: 400 }
       )
     }
 
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
         success: false,
         error: "Failed to create blog",
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }

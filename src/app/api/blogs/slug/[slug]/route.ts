@@ -5,7 +5,7 @@ import { blogs } from "@/db/schema"
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const { slug } = await params
@@ -18,7 +18,7 @@ export async function GET(
           success: false,
           error: "Blog not found",
         },
-        { status: 404 },
+        { status: 404 }
       )
     }
 
@@ -33,7 +33,7 @@ export async function GET(
         success: false,
         error: "Failed to fetch blog",
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }

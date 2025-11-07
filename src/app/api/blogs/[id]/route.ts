@@ -26,7 +26,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
           success: false,
           error: "Blog not found",
         },
-        { status: 404 },
+        { status: 404 }
       )
     }
 
@@ -41,7 +41,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         success: false,
         error: "Failed to fetch blog",
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
@@ -60,7 +60,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           success: false,
           error: "Blog not found",
         },
-        { status: 404 },
+        { status: 404 }
       )
     }
 
@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             success: false,
             error: "Slug already exists",
           },
-          { status: 400 },
+          { status: 400 }
         )
       }
     }
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           error: "Validation failed",
           details: error.issues,
         },
-        { status: 400 },
+        { status: 400 }
       )
     }
 
@@ -113,14 +113,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         success: false,
         error: "Failed to update blog",
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
@@ -133,7 +133,7 @@ export async function DELETE(
           success: false,
           error: "Blog not found",
         },
-        { status: 404 },
+        { status: 404 }
       )
     }
 
@@ -150,7 +150,7 @@ export async function DELETE(
         success: false,
         error: "Failed to delete blog",
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }

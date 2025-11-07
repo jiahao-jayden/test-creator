@@ -42,7 +42,7 @@ const matchRoutes = (pathname: string, routes: string[]): boolean => {
 const getRouteInfo = (
   pathname: string,
   protectedRoutes: string[],
-  protectedAPIRoutes: string[],
+  protectedAPIRoutes: string[]
 ): RouteInfo => {
   const isAPI = matchRoutes(pathname, protectedAPIRoutes) || pathname.startsWith("/api")
 

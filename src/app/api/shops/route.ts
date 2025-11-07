@@ -24,10 +24,7 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       query = query.where(
-        or(
-          ilike(shops.name, `%${search}%`),
-          ilike(shops.description, `%${search}%`),
-        ),
+        or(ilike(shops.name, `%${search}%`), ilike(shops.description, `%${search}%`))
       )
     }
 
@@ -59,7 +56,7 @@ export async function GET(request: NextRequest) {
         success: false,
         error: "Failed to fetch shops",
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
@@ -82,7 +79,7 @@ export async function POST(request: NextRequest) {
         success: true,
         data: newShop,
       },
-      { status: 201 },
+      { status: 201 }
     )
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -92,7 +89,7 @@ export async function POST(request: NextRequest) {
           error: "Validation failed",
           details: error.issues,
         },
-        { status: 400 },
+        { status: 400 }
       )
     }
 
@@ -102,7 +99,7 @@ export async function POST(request: NextRequest) {
         success: false,
         error: "Failed to create shop",
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
