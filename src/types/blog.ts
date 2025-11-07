@@ -9,7 +9,7 @@ export type CreateBlogInput = {
   excerpt?: string
   author?: string
   tags?: string[]
-  published?: string
+  coverImage?: string
 }
 
 export type UpdateBlogInput = {
@@ -19,7 +19,7 @@ export type UpdateBlogInput = {
   excerpt?: string
   author?: string
   tags?: string[]
-  published?: string
+  coverImage?: string
 }
 
 export type BlogListResponse = {

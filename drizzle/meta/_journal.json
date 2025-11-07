@@ -15,6 +15,13 @@
       "when": 1762435604204,
       "tag": "0001_huge_baron_strucker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762517613633,
+      "tag": "0002_regular_wallflower",
+      "breakpoints": true
     }
   ]
 }

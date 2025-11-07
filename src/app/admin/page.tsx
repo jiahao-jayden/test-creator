@@ -1,7 +1,6 @@
 "use client"
 
-import { BlogList } from "@/components/admin/blog-list"
-import { CreateBlogButton } from "@/components/admin/create-blog-button"
+import { BlogList, CreateBlogButton } from "@/components/admin/blog"
 
 export default function AdminPage() {
   return (

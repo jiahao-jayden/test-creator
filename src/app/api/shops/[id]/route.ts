@@ -2,29 +2,26 @@ import { eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import db from "@/db"
-import { blogs } from "@/db/schema"
+import { shops } from "@/db/schema"
 
-const updateBlogSchema = z.object({
-  title: z.string().min(1, "Title is required").optional(),
-  slug: z.string().min(1, "Slug is required").optional(),
-  content: z.string().min(1, "Content is required").optional(),
-  excerpt: z.string().optional(),
-  author: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  coverImage: z.string().optional(),
+const updateShopSchema = z.object({
+  name: z.string().min(1, "Name is required").optional(),
+  image: z.string().url("Image must be a valid URL").optional(),
+  price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Price must be a valid decimal number").optional(),
+  description: z.string().min(1, "Description is required").optional(),
 })
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
 
-    const [blog] = await db.select().from(blogs).where(eq(blogs.id, id)).limit(1)
+    const [shop] = await db.select().from(shops).where(eq(shops.id, id)).limit(1)
 
-    if (!blog) {
+    if (!shop) {
       return NextResponse.json(
         {
           success: false,
-          error: "Blog not found",
+          error: "Shop not found",
         },
         { status: 404 },
       )
@@ -32,14 +29,14 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
     return NextResponse.json({
       success: true,
-      data: blog,
+      data: shop,
     })
   } catch (error) {
-    console.error("Error fetching blog:", error)
+    console.error("Error fetching shop:", error)
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch blog",
+        error: "Failed to fetch shop",
       },
       { status: 500 },
     )
@@ -50,50 +47,32 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { id } = await params
     const body = await request.json()
-    const validatedData = updateBlogSchema.parse(body)
+    const validatedData = updateShopSchema.parse(body)
 
-    const [existingBlog] = await db.select().from(blogs).where(eq(blogs.id, id)).limit(1)
+    const [existingShop] = await db.select().from(shops).where(eq(shops.id, id)).limit(1)
 
-    if (!existingBlog) {
+    if (!existingShop) {
       return NextResponse.json(
         {
           success: false,
-          error: "Blog not found",
+          error: "Shop not found",
         },
         { status: 404 },
       )
     }
 
-    if (validatedData.slug && validatedData.slug !== existingBlog.slug) {
-      const [duplicateBlog] = await db
-        .select()
-        .from(blogs)
-        .where(eq(blogs.slug, validatedData.slug))
-        .limit(1)
-
-      if (duplicateBlog) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Slug already exists",
-          },
-          { status: 400 },
-        )
-      }
-    }
-
-    const [updatedBlog] = await db
-      .update(blogs)
+    const [updatedShop] = await db
+      .update(shops)
       .set({
         ...validatedData,
         updatedAt: new Date(),
       })
-      .where(eq(blogs.id, id))
+      .where(eq(shops.id, id))
       .returning()
 
     return NextResponse.json({
       success: true,
-      data: updatedBlog,
+      data: updatedShop,
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -107,11 +86,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       )
     }
 
-    console.error("Error updating blog:", error)
+    console.error("Error updating shop:", error)
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to update blog",
+        error: "Failed to update shop",
       },
       { status: 500 },
     )
@@ -125,30 +104,30 @@ export async function DELETE(
   try {
     const { id } = await params
 
-    const [existingBlog] = await db.select().from(blogs).where(eq(blogs.id, id)).limit(1)
+    const [existingShop] = await db.select().from(shops).where(eq(shops.id, id)).limit(1)
 
-    if (!existingBlog) {
+    if (!existingShop) {
       return NextResponse.json(
         {
           success: false,
-          error: "Blog not found",
+          error: "Shop not found",
         },
         { status: 404 },
       )
     }
 
-    await db.delete(blogs).where(eq(blogs.id, id))
+    await db.delete(shops).where(eq(shops.id, id))
 
     return NextResponse.json({
       success: true,
-      message: "Blog deleted successfully",
+      message: "Shop deleted successfully",
     })
   } catch (error) {
-    console.error("Error deleting blog:", error)
+    console.error("Error deleting shop:", error)
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to delete blog",
+        error: "Failed to delete shop",
       },
       { status: 500 },
     )

@@ -1,1 +1,8 @@
-{}
+{
+  "baseInfo": {
+    "name": {
+      "value": "WeCode Team",
+      "description": "value of the name"
+    }
+  }
+}

@@ -8,7 +8,7 @@ export const blogs = pgTable("blogs", {
   excerpt: text("excerpt"),
   author: varchar("author", { length: 100 }),
   tags: text("tags").array(),
-  published: timestamp("published").defaultNow(),
+  coverImage: text("cover_image"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
