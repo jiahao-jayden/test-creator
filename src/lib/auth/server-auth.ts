@@ -13,7 +13,7 @@ export const auth = betterAuth({
     "*.e2b.dev",
     "*.we0.ai",
     "http://localhost:3345",
-    "http://localhost:3000",
+    "http://localhost:3355",
   ],
   plugins: [
     nextCookies(),
