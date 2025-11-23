@@ -112,7 +112,7 @@ importers:
         specifier: ^19
         version: 19.2.2(@types/react@19.2.2)
       tailwindcss:
-        specifier: ^4
+        specifier: ^4.1.17
         version: 4.1.17
       tw-animate-css:
         specifier: ^1.4.0
