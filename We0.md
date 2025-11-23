@@ -1,114 +1,453 @@
 # We0.md
 
-This file provides guidance to We0 (we0.ai) when working with code in this repository.
+本文件为 We0 (we0.ai) 在处理此代码库时提供指导。
 
-## Project Overview
+## 项目概述
 
-This is a Next.js 15 application called "registration-system" that serves as a content management platform for blogs and shops. It's built with modern React patterns using the App Router, TypeScript, and includes authentication, database integration, and an admin interface.
+这是一个名为 "registration-system" 的 Next.js 15 应用程序，作为博客和商店的内容平台。它使用 App Router、TypeScript 构建，采用现代 React 模式，包含身份验证、数据库集成和管理界面。
 
-## Development Commands
+## 开发命令
 
 ```bash
-# Start development server with Turbopack
+# 使用 Turbopack 启动开发服务器
 npm run dev
 
-# Build for production with Turbopack
+# 使用 Turbopack 构建生产版本
 npm run build
 
-# Start production server
+# 启动生产服务器
 npm start
-
-# Lint and fix code
-npm run lint
-
-# Format code
-npm run format
 ```
 
-## Environment Setup
+## API 接口文档
 
-Copy `env.example` to `.env.local` and configure:
+### 博客接口 (Blogs)
 
-- `NEXT_PUBLIC_BASE_URL` - Your app's base URL
-- `DATABASE_URL` - PostgreSQL connection string
-- `BETTER_AUTH_SECRET` - Secret for Better Auth
-- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` - For Google OAuth (optional)
-- `RESEND_FROM_EMAIL` & `RESEND_API_KEY` - For email OTP functionality
+#### GET /api/blogs
+获取博客列表
 
-## Database Management
+**输入（查询参数）：**
+- `search` (可选): 搜索关键词，会在标题、内容和摘要中搜索
+- `tag` (可选): 按标签筛选
+- `limit` (可选): 每页数量，默认 10
+- `offset` (可选): 偏移量，默认 0
 
-The project uses Drizzle ORM with PostgreSQL:
-
-```bash
-# Generate migrations
-npx drizzle-kit generate
-
-# Push schema changes to database
-npx drizzle-kit push
-
-# Open Drizzle Studio for database management
-npx drizzle-kit studio
+**输出（成功，200）：**
+```json
+{
+  "success": true,
+  "data": [/* 博客数组 */],
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "total": 数量
+  }
+}
 ```
 
-Migration files are stored in the `drizzle/` directory.
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to fetch blogs"
+}
+```
 
-## Architecture Overview
+---
 
-### Authentication System
-- Uses Better Auth with email OTP and Google OAuth support
-- Session management with cookie caching (5-minute cache)
-- Client and server-side auth utilities in `src/lib/auth/`
-- Trusted origins configured for development and production domains
+#### POST /api/blogs
+创建新博客
 
-### Database Schema
-- **Blogs**: Title, slug, content, excerpt, author, tags, cover image
-- **Shops**: Name, image, price, description
-- **Auth tables**: Managed automatically by Better Auth adapter
+**输入（JSON Body）：**
+```json
+{
+  "title": "string (必填)",
+  "slug": "string (必填)",
+  "content": "string (必填)",
+  "excerpt": "string (可选)",
+  "author": "string (可选)",
+  "tags": ["string"] (可选),
+  "coverImage": "string (可选)"
+}
+```
 
-### API Structure
-- RESTful APIs in `src/app/api/`
-- Blog management: GET (with search/filtering), POST, PUT, DELETE
-- Shop management: Similar CRUD operations
-- All API routes include proper error handling and Zod validation
+**输出（成功，201）：**
+```json
+{
+  "success": true,
+  "data": {/* 创建的博客对象 */}
+}
+```
 
-### Frontend Architecture
-- **App Router**: Next.js 15 with React 19
-- **State Management**: TanStack Query for server state
-- **UI Components**: Radix UI primitives with custom styling
-- **Styling**: Tailwind CSS with custom component variants
-- **Forms**: React Hook Form with Zod validation
+**输出（错误，400 - Slug 已存在）：**
+```json
+{
+  "success": false,
+  "error": "Slug already exists"
+}
+```
 
-### Admin Interface
-- Protected admin routes for content management
-- Blog creation, editing, and deletion
-- Shop management with image uploads
-- Sidebar navigation with responsive design
+**输出（错误，400 - 验证失败）：**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [/* Zod 验证错误详情 */]
+}
+```
 
-### Component Structure
-- `components/admin/` - Admin-specific components
-- `components/ui/` - Reusable UI components (excluded from linting)
-- `components/sign-in/` - Authentication components
-- Custom hooks in `src/hooks/` for data fetching
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to create blog"
+}
+```
 
-### Email System
-- React Email components for OTP verification
-- Resend integration for email delivery
-- Customizable email templates
+---
 
-## Code Quality
+#### GET /api/blogs/[id]
+根据 ID 获取单个博客
 
-- **Linting**: Biome with custom rules and formatting
-- **TypeScript**: Strict configuration with proper typing
-- **Code Organization**: Feature-based structure with clear separation of concerns
+**输入（路径参数）：**
+- `id`: 博客 ID
 
-## Key Dependencies
+**输出（成功，200）：**
+```json
+{
+  "success": true,
+  "data": {/* 博客对象 */}
+}
+```
 
-- **Framework**: Next.js 15 with Turbopack
-- **Database**: Drizzle ORM + PostgreSQL
-- **Authentication**: Better Auth
-- **UI**: Radix UI + Tailwind CSS
-- **Forms**: React Hook Form + Zod
-- **Email**: React Email + Resend
-- **State**: TanStack Query
+**输出（错误，404）：**
+```json
+{
+  "success": false,
+  "error": "Blog not found"
+}
+```
 
-The project follows modern React patterns with TypeScript, proper error boundaries, and comprehensive type safety throughout the application.
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to fetch blog"
+}
+```
+
+---
+
+#### PUT /api/blogs/[id]
+更新博客
+
+**输入（路径参数）：**
+- `id`: 博客 ID
+
+**输入（JSON Body，所有字段可选）：**
+```json
+{
+  "title": "string (可选)",
+  "slug": "string (可选)",
+  "content": "string (可选)",
+  "excerpt": "string (可选)",
+  "author": "string (可选)",
+  "tags": ["string"] (可选),
+  "coverImage": "string (可选)"
+}
+```
+
+**输出（成功，200）：**
+```json
+{
+  "success": true,
+  "data": {/* 更新后的博客对象 */}
+}
+```
+
+**输出（错误，404）：**
+```json
+{
+  "success": false,
+  "error": "Blog not found"
+}
+```
+
+**输出（错误，400 - Slug 已存在）：**
+```json
+{
+  "success": false,
+  "error": "Slug already exists"
+}
+```
+
+**输出（错误，400 - 验证失败）：**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [/* Zod 验证错误详情 */]
+}
+```
+
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to update blog"
+}
+```
+
+---
+
+#### DELETE /api/blogs/[id]
+删除博客
+
+**输入（路径参数）：**
+- `id`: 博客 ID
+
+**输出（成功，200）：**
+```json
+{
+  "success": true,
+  "message": "Blog deleted successfully"
+}
+```
+
+**输出（错误，404）：**
+```json
+{
+  "success": false,
+  "error": "Blog not found"
+}
+```
+
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to delete blog"
+}
+```
+
+---
+
+#### GET /api/blogs/slug/[slug]
+根据 slug 获取博客
+
+**输入（路径参数）：**
+- `slug`: 博客 slug
+
+**输出（成功，200）：**
+```json
+{
+  "success": true,
+  "data": {/* 博客对象 */}
+}
+```
+
+**输出（错误，404）：**
+```json
+{
+  "success": false,
+  "error": "Blog not found"
+}
+```
+
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to fetch blog"
+}
+```
+
+---
+
+### 商店接口 (Shops)
+
+#### GET /api/shops
+获取商店列表
+
+**输入（查询参数）：**
+- `search` (可选): 搜索关键词，会在名称和描述中搜索
+- `limit` (可选): 每页数量，默认 10
+- `offset` (可选): 偏移量，默认 0
+- `minPrice` (可选): 最低价格
+- `maxPrice` (可选): 最高价格
+
+**输出（成功，200）：**
+```json
+{
+  "success": true,
+  "data": [/* 商店数组 */],
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "total": 数量
+  }
+}
+```
+
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to fetch shops"
+}
+```
+
+---
+
+#### POST /api/shops
+创建新商店
+
+**输入（JSON Body）：**
+```json
+{
+  "name": "string (必填)",
+  "image": "string (必填，必须是有效的 URL)",
+  "price": "string (必填，格式：数字，最多两位小数，如 '10.99')",
+  "description": "string (必填)"
+}
+```
+
+**输出（成功，201）：**
+```json
+{
+  "success": true,
+  "data": {/* 创建的商店对象 */}
+}
+```
+
+**输出（错误，400 - 验证失败）：**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [/* Zod 验证错误详情 */]
+}
+```
+
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to create shop"
+}
+```
+
+---
+
+#### GET /api/shops/[id]
+根据 ID 获取单个商店
+
+**输入（路径参数）：**
+- `id`: 商店 ID
+
+**输出（成功，200）：**
+```json
+{
+  "success": true,
+  "data": {/* 商店对象 */}
+}
+```
+
+**输出（错误，404）：**
+```json
+{
+  "success": false,
+  "error": "Shop not found"
+}
+```
+
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to fetch shop"
+}
+```
+
+---
+
+#### PUT /api/shops/[id]
+更新商店
+
+**输入（路径参数）：**
+- `id`: 商店 ID
+
+**输入（JSON Body，所有字段可选）：**
+```json
+{
+  "name": "string (可选)",
+  "image": "string (可选，必须是有效的 URL)",
+  "price": "string (可选，格式：数字，最多两位小数)",
+  "description": "string (可选)"
+}
+```
+
+**输出（成功，200）：**
+```json
+{
+  "success": true,
+  "data": {/* 更新后的商店对象 */}
+}
+```
+
+**输出（错误，404）：**
+```json
+{
+  "success": false,
+  "error": "Shop not found"
+}
+```
+
+**输出（错误，400 - 验证失败）：**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [/* Zod 验证错误详情 */]
+}
+```
+
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to update shop"
+}
+```
+
+---
+
+#### DELETE /api/shops/[id]
+删除商店
+
+**输入（路径参数）：**
+- `id`: 商店 ID
+
+**输出（成功，200）：**
+```json
+{
+  "success": true,
+  "message": "Shop deleted successfully"
+}
+```
+
+**输出（错误，404）：**
+```json
+{
+  "success": false,
+  "error": "Shop not found"
+}
+```
+
+**输出（错误，500）：**
+```json
+{
+  "success": false,
+  "error": "Failed to delete shop"
+}
+```
